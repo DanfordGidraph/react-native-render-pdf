@@ -1,13 +1,6 @@
-
-
 ## [1.0.1](https://github.com/DanfordGidraph/react-native-render-pdf/compare/v.1.0.0...v1.0.1) (2024-07-03)
 
-### ChangeLog
-
-<details>
-  <summary>ChangeLog details</summary>
-
-v1.0.0
+## v1.0.0
 
 - Initial release
 - Updates the native dependencies to the latest versions
