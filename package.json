@@ -5,10 +5,7 @@
   "description": "A modern React Native PDF view component that supports Android and iOS",
   "main": "index.js",
   "typings": "./index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/danfordgidraph/react-native-render-pdf.git"
-  },
+  "repository": "https://github.com/DanfordGidraph/react-native-render-pdf",
   "keywords": [
     "react-component",
     "react-native",
