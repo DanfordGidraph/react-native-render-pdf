@@ -22,7 +22,7 @@ jobs:
           cache: yarn
           registry-url: "https://registry.npmjs.org"
       - run: npm install -g npm yarn
-      - run: yarn
+      - run: corepack enable && yarn
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
