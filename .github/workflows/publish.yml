@@ -23,8 +23,6 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: npm install -g npm yarn
       - run: corepack enable && yarn
-      - name: Release
+      - run: npm publish --provenance --access public
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx semantic-release
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
