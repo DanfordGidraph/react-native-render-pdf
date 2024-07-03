@@ -22,7 +22,7 @@
     "semver": "standard-version",
     "tag-release": "git push --follow-tags origin master",
     "release": "yarn semver && yarn tag-release",
-    "publish": "release-it"
+    "build:release": "release-it"
   },
   "release-it": {
     "git": {
