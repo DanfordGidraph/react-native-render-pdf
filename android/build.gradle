@@ -1,0 +1,172 @@
+import com.android.Version
+
+description = 'react-native-render-pdf'
+
+buildscript {
+    def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : "1.9.24"
+
+    ext.safeExtGet = {prop, fallback ->
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.4.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+def isNewArchitectureEnabled() {
+    // To opt-in for the New Architecture, you can either:
+    // - Set `newArchEnabled` to true inside the `gradle.properties` file
+    // - Invoke gradle with `-newArchEnabled=true`
+    // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+def resolveReactNativeDirectory() {
+    def reactNativeLocation = safeExtGet("REACT_NATIVE_NODE_MODULES_DIR", null)
+    if (reactNativeLocation != null) {
+        return file(reactNativeLocation)
+    }
+
+    // monorepo workaround
+    // react-native can be hoisted or in project's own node_modules
+    def reactNativeFromProjectNodeModules = file("${rootProject.projectDir}/../node_modules/react-native")
+    if (reactNativeFromProjectNodeModules.exists()) {
+        return reactNativeFromProjectNodeModules
+    }
+
+    def reactNativeFromNodeModulesWithPDF = file("${projectDir}/../../react-native")
+    if (reactNativeFromNodeModulesWithPDF.exists()) {
+        return reactNativeFromNodeModulesWithPDF
+    }
+
+    throw new Exception(
+            "[react-native-render-pdf] Unable to resolve react-native location in " +
+                    "node_modules. You should add project extension property (in app/build.gradle) " +
+                    "`REACT_NATIVE_NODE_MODULES_DIR` with path to react-native."
+    )
+}
+
+//def REACT_NATIVE_DIR = resolveReactNativeDirectory()
+//
+//def reactProperties = new Properties()
+//file("$REACT_NATIVE_DIR/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
+//
+//def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME")
+//def REACT_NATIVE_MINOR_VERSION = REACT_NATIVE_VERSION.startsWith("0.0.0-") ? 1000 : REACT_NATIVE_VERSION.split("\\.")[1].toInteger()
+
+def getReactNativeMinorVersion() {
+    def REACT_NATIVE_DIR = resolveReactNativeDirectory()
+
+    def reactProperties = new Properties()
+    file("$REACT_NATIVE_DIR/ReactAndroid/gradle.properties").withInputStream { reactProperties.load(it) }
+
+    def REACT_NATIVE_VERSION = reactProperties.getProperty("VERSION_NAME")
+    def REACT_NATIVE_MINOR_VERSION = REACT_NATIVE_VERSION.startsWith("0.0.0-") ? 1000 : REACT_NATIVE_VERSION.split("\\.")[1].toInteger()
+
+    return REACT_NATIVE_MINOR_VERSION
+}
+
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+
+
+
+repositories {
+    google()
+    mavenCentral()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$projectDir/../node_modules/react-native/android"
+        content {
+            // Use Jitpack only for Android Pdf Viewer; the rest is hosted at mavenCentral.
+            includeGroup "com.github.infomaniak"
+        }
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 34)
+    buildToolsVersion safeExtGet('buildToolsVersion', "34.0.0")
+
+    def agpVersion = Version.ANDROID_GRADLE_PLUGIN_VERSION
+    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+        namespace "org.staxtech.android.pdf"
+    }
+
+    if (rootProject.hasProperty("ndkVersion")) {
+        ndkVersion rootProject.ext.ndkVersion
+    }
+
+//    if (REACT_NATIVE_MINOR_VERSION >= 71) {
+//        buildFeatures {
+//            prefab true
+//        }
+//    }
+
+    if (agpVersion.tokenize('.')[0].toInteger() >= 8) {
+        buildFeatures {
+            buildConfig = true
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 21)
+        targetSdkVersion safeExtGet('targetSdkVersion', 33)
+        versionCode 1
+        versionName "1.0.0"
+
+        buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets.main {
+        java {
+            if (!isNewArchitectureEnabled()) {
+                srcDirs += [
+                    "src/paper/java",
+                ]
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError true
+    }
+
+    packagingOptions {
+       pickFirst 'lib/x86/libc++_shared.so'
+       pickFirst 'lib/x86_64/libjsc.so'
+       pickFirst 'lib/x86_64/libc++_shared.so'
+       pickFirst 'lib/arm64-v8a/libjsc.so'
+       pickFirst 'lib/arm64-v8a/libc++_shared.so'
+       pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+    }
+}
+
+def kotlin_version = safeExtGet('kotlinVersion', "1.9.24")
+
+dependencies {
+    if (isNewArchitectureEnabled() && getReactNativeMinorVersion() < 71) {
+        implementation project(":ReactAndroid")
+    } else {
+        implementation 'com.facebook.react:react-native:+' // From node_modules
+    }
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.github.Infomaniak:android-pdfview:3.2.10'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}

@@ -1,0 +1,68 @@
+{
+  "name": "react-native-render-pdf",
+  "version": "1.1.0",
+  "summary": "A modern React Native PDF view component",
+  "description": "A modern React Native PDF view component that supports Android and iOS",
+  "main": "index.js",
+  "typings": "./index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danfordgidraph/react-native-render-pdf.git"
+  },
+  "keywords": [
+    "react-component",
+    "react-native",
+    "android",
+    "ios",
+    "pdf",
+    "view",
+    "viewer"
+  ],
+  "author": {
+    "name": "Staxtech",
+    "url": "https://github.com/danfordgidraph"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/danfordgidraph/react-native-render-pdf",
+  "bugs": {
+    "url": "https://github.com/danfordgidraph/react-native-render-pdf/issues"
+  },
+  "dependencies": {
+    "md5": "^2.3.0",
+    "deprecated-react-native-prop-types": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.2",
+    "@babel/runtime": "^7.20.1",
+    "prop-types": "^15.7.2"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-blob-util": ">=0.13.7"
+  },
+  "files": [
+    "android/",
+    "ios/",
+    "windows/",
+    "DoubleTapView.js",
+    "index.d.ts",
+    "index.js",
+    "index.js.flow",
+    "PdfManager.js",
+    "PdfPageView.js",
+    "PdfView.js",
+    "PdfViewFlatList.js",
+    "PinchZoomView.js",
+    "react-native-render-pdf.podspec",
+    "fabric/"
+  ],
+  "codegenConfig": {
+    "name": "rnpdf",
+    "type": "components",
+    "jsSrcsDir": "./fabric",
+    "android": {
+      "javaPackageName": "org.staxtech.android.pdf"
+    }
+  }
+}
