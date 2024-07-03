@@ -21,6 +21,7 @@ jobs:
           node-version: "20.x"
           cache: yarn
           registry-url: "https://registry.npmjs.org"
+      - run: corepack enable
       - run: npm install -g npm yarn
       - run: yarn
       - name: Release
