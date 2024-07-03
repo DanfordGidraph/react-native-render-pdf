@@ -11,8 +11,8 @@ package org.staxtech.android.pdf;
 
 import java.io.File;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
@@ -30,53 +30,43 @@ import com.infomaniak.lib.pdfview.listener.OnTapListener;
 import com.infomaniak.lib.pdfview.listener.OnDrawListener;
 import com.infomaniak.lib.pdfview.listener.OnPageScrollListener;
 import com.infomaniak.lib.pdfview.util.FitPolicy;
-import com.infomaniak.lib.pdfview.util.Constants;
 import com.infomaniak.lib.pdfview.link.LinkHandler;
 import com.infomaniak.lib.pdfview.model.LinkTapEvent;
 
-import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.facebook.react.common.MapBuilder;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.common.logging.FLog;
-import com.facebook.react.common.ReactConstants;
+import com.facebook.react.uimanager.events.RCTModernEventEmitter;
 
 import static java.lang.String.format;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.shockwave.pdfium.util.SizeF;
 
+@SuppressLint("ViewConstructor")
 public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompleteListener,OnErrorListener,OnTapListener,OnDrawListener,OnPageScrollListener, LinkHandler {
-    private ThemedReactContext context;
+    ReactContext reactContext = null;
     private int page = 1;               // start from 1
     private boolean horizontal = false;
     private float scale = 1;
     private float minScale = 1;
     private float maxScale = 3;
-    private String asset;
     private String path;
     private int spacing = 10;
     private String password = "";
     private boolean enableAntialiasing = true;
     private boolean enableAnnotationRendering = true;
 
-    private boolean enablePaging = false;
     private boolean autoSpacing = false;
     private boolean pageFling = false;
     private boolean pageSnap = false;
     private FitPolicy fitPolicy = FitPolicy.WIDTH;
     private boolean singlePage = false;
-
-    private static PdfView instance = null;
 
     private float originalWidth = 0;
     private float lastPageWidth = 0;
@@ -86,10 +76,9 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     private int oldW = 0;
     private int oldH = 0;
 
-    public PdfView(ThemedReactContext context, AttributeSet set){
+    public PdfView(ThemedReactContext context, AttributeSet set, ReactContext mCallerContext){
         super(context,set);
-        this.context = context;
-        this.instance = this;
+        reactContext = mCallerContext;
     }
 
     @Override
@@ -101,8 +90,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "pageChanged|"+page+"|"+numberOfPages);
-        ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                -1,
             this.getId(),
             "topChange",
             event
@@ -143,7 +132,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         Gson gson = new Gson();
         event.putString("message", "loadComplete|"+numberOfPages+"|"+width+"|"+height+"|"+gson.toJson(this.getTableOfContents()));
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                -1,
             this.getId(),
             "topChange",
             event
@@ -156,14 +146,15 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     @Override
     public void onError(Throwable t){
         WritableMap event = Arguments.createMap();
-        if (t.getMessage().contains("Password required or incorrect password")) {
+        if (Objects.requireNonNull(t.getMessage()).contains("Password required or incorrect password")) {
             event.putString("message", "error|Password required or incorrect password.");
         } else {
             event.putString("message", "error|"+t.getMessage());
         }
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                -1,
             this.getId(),
             "topChange",
             event
@@ -174,8 +165,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     public void onPageScrolled(int page, float positionOffset){
 
         // maybe change by other instance, restore zoom setting
-        Constants.Pinch.MINIMUM_ZOOM = this.minScale;
-        Constants.Pinch.MAXIMUM_ZOOM = this.maxScale;
+        this.setMinZoom(this.minScale);
+        this.setMaxZoom(this.maxScale);
 
     }
 
@@ -190,7 +181,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         event.putString("message", "pageSingleTap|"+page+"|"+e.getX()+"|"+e.getY());
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                -1,
             this.getId(),
             "topChange",
             event
@@ -209,14 +201,15 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         
         if (lastPageWidth>0 && lastPageHeight>0 && (pageWidth!=lastPageWidth || pageHeight!=lastPageHeight)) {
             // maybe change by other instance, restore zoom setting
-            Constants.Pinch.MINIMUM_ZOOM = this.minScale;
-            Constants.Pinch.MAXIMUM_ZOOM = this.maxScale;
+            this.setMinZoom(this.minScale);
+            this.setMaxZoom(this.maxScale);
 
             WritableMap event = Arguments.createMap();
             event.putString("message", "scaleChanged|"+(pageWidth/originalWidth));
 
             ReactContext reactContext = (ReactContext)this.getContext();
-            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+            reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                    -1,
                 this.getId(),
                 "topChange",
                 event
@@ -243,8 +236,6 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
             this.setMinZoom(this.minScale);
             this.setMaxZoom(this.maxScale);
             this.setMidZoom((this.maxScale+this.minScale)/2);
-            Constants.Pinch.MINIMUM_ZOOM = this.minScale;
-            Constants.Pinch.MAXIMUM_ZOOM = this.maxScale;
 
             Configurator configurator;
 
@@ -298,7 +289,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
     // page start from 1
     public void setPage(int page) {
-        this.page = page>1?page:1;
+        this.page = Math.max(page, 1);
     }
 
     public void setScale(float scale) {
@@ -334,8 +325,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
 
     public void setEnablePaging(boolean enablePaging) {
-        this.enablePaging = enablePaging;
-        if (this.enablePaging) {
+        if (enablePaging) {
             this.autoSpacing = true;
             this.pageFling = true;
             this.pageSnap = true;
@@ -369,7 +359,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
 
     /**
-     * @see https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java
+     * @see <a href="https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java">...</a>
      */
     public void handleLinkEvent(LinkTapEvent event) {
         String uri = event.getLink().getUri();
@@ -382,14 +372,15 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
 
     /**
-     * @see https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java
+     * @see <a href="https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java">...</a>
      */
     private void handleUri(String uri) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "linkPressed|"+uri);
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
+                -1,
             this.getId(),
             "topChange",
             event
@@ -397,7 +388,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
 
     /**
-     * @see https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java
+     * @see <a href="https://github.com/barteksc/AndroidPdfViewer/blob/master/android-pdf-viewer/src/main/java/com/github/barteksc/pdfviewer/link/DefaultLinkHandler.java">...</a>
      */
     private void handlePage(int page) {
         this.jumpTo(page);
