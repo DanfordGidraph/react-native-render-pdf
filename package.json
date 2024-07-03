@@ -15,8 +15,31 @@
     "view",
     "viewer"
   ],
+  "scripts": {
+    "semver": "standard-version",
+    "tag-release": "git push --follow-tags origin master",
+    "release": "yarn semver && yarn tag-release",
+    "publish": "release-it"
+  },
+  "release-it": {
+    "git": {
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}"
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": "react"
+      }
+    }
+  },
   "author": {
-    "name": "Staxtech",
+    "name": "Danford Gidraph",
     "url": "https://github.com/danfordgidraph"
   },
   "license": "MIT",
@@ -25,8 +48,12 @@
     "url": "https://github.com/danfordgidraph/react-native-render-pdf/issues"
   },
   "dependencies": {
+    "@release-it/conventional-changelog": "^8.0.1",
     "deprecated-react-native-prop-types": "^2.3.0",
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "release-it": "^17.4.1",
+    "standard-version": "^9.5.0",
+    "typescript": "^5.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
