@@ -9,15 +9,13 @@
 
 package org.staxtech.android.pdf;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -26,10 +24,11 @@ import com.facebook.react.uimanager.ViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNPDFPdfViewManagerDelegate;
 import com.facebook.react.viewmanagers.RNPDFPdfViewManagerInterface;
 
-@ReactModule(name = PdfManager.REACT_CLASS)
+import java.util.Map;
+
 public class PdfManager extends SimpleViewManager<PdfView> implements RNPDFPdfViewManagerInterface<PdfView> {
+   public ReactApplicationContext mCallerContext;
     public static final String REACT_CLASS = "RNPDFPdfView";
-    private Context context;
     private PdfView pdfView;
     private final ViewManagerDelegate<PdfView> mDelegate;
 
@@ -44,23 +43,35 @@ public class PdfManager extends SimpleViewManager<PdfView> implements RNPDFPdfVi
     }
 
     public PdfManager(ReactApplicationContext reactContext){
-        this.context = reactContext;
         mDelegate = new RNPDFPdfViewManagerDelegate<>(this);
+        this.mCallerContext = reactContext;
     }
 
+    @NonNull
     @Override
     public String getName() {
         return REACT_CLASS;
     }
 
+    @NonNull
     @Override
-    public PdfView createViewInstance(ThemedReactContext context) {
-        this.pdfView = new PdfView(context,null);
-        return pdfView;
+    public PdfView createViewInstance(@NonNull ThemedReactContext context) {
+        return new PdfView(context,null,mCallerContext);
     }
 
     @Override
-    public void onDropViewInstance(PdfView pdfView) {
+    public Map getExportedCustomBubblingEventTypeConstants() {
+        return MapBuilder.builder().put(
+                "topChange",
+                MapBuilder.of(
+                        "phasedRegistrationNames",
+                        MapBuilder.of("bubbled", "onChange")
+                )
+        ).build();
+    }
+
+    @Override
+    public void onDropViewInstance(@NonNull PdfView pdfView) {
         pdfView = null;
     }
 
@@ -163,7 +174,7 @@ public class PdfManager extends SimpleViewManager<PdfView> implements RNPDFPdfVi
     }
 
     @Override
-    public void onAfterUpdateTransaction(PdfView pdfView) {
+    public void onAfterUpdateTransaction(@NonNull PdfView pdfView) {
         super.onAfterUpdateTransaction(pdfView);
         pdfView.drawPdf();
     }
