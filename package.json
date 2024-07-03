@@ -64,5 +64,8 @@
     "android": {
       "javaPackageName": "org.staxtech.android.pdf"
     }
+  },
+  "publishConfig": {
+    "provenance": true
   }
 }
