@@ -24,7 +24,7 @@ import React, { Component } from 'react';
 
 import PdfView from 'react-native-render-pdf/PdfView';
 import PropTypes from 'prop-types';
-import ReactNativeBlobUtil from 'rn-fetch-blob-v1'
+import ReactNativeBlobUtil from 'react-native-blob-util'
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 
 const MD5 = require('md5');
