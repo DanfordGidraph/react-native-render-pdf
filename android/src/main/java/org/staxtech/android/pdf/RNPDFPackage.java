@@ -9,32 +9,27 @@
 
 package org.staxtech.android.pdf;
 
+import androidx.annotation.NonNull;
+
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
 public class RNPDFPackage implements ReactPackage {
 
+    @NonNull
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+    public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         return Collections.emptyList();
     }
 
-    // Deprecated as of RN 0.47.0
-    public List<Class<? extends JavaScriptModule>> createJSModules() {
-        return Collections.emptyList();
-    }
-
+    @NonNull
     @Override
-    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        List<ViewManager> modules = new ArrayList<>();
-        modules.add(new PdfManager(reactContext));
-        return modules;
+    public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactContext) {
+        return List.of(new PdfManager(reactContext));
     }
 }
