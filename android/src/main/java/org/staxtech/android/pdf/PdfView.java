@@ -37,7 +37,7 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.events.RCTModernEventEmitter;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import static java.lang.String.format;
 
@@ -90,8 +90,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "pageChanged|"+page+"|"+numberOfPages);
-        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                -1,
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             this.getId(),
             "topChange",
             event
@@ -132,8 +131,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         Gson gson = new Gson();
         event.putString("message", "loadComplete|"+numberOfPages+"|"+width+"|"+height+"|"+gson.toJson(this.getTableOfContents()));
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                -1,
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             this.getId(),
             "topChange",
             event
@@ -153,8 +151,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         }
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                -1,
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             this.getId(),
             "topChange",
             event
@@ -181,8 +178,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         event.putString("message", "pageSingleTap|"+page+"|"+e.getX()+"|"+e.getY());
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                -1,
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             this.getId(),
             "topChange",
             event
@@ -208,8 +204,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
             event.putString("message", "scaleChanged|"+(pageWidth/originalWidth));
 
             ReactContext reactContext = (ReactContext)this.getContext();
-            reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                    -1,
+            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
                 this.getId(),
                 "topChange",
                 event
@@ -379,8 +374,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         event.putString("message", "linkPressed|"+uri);
 
         ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTModernEventEmitter.class).receiveEvent(
-                -1,
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
             this.getId(),
             "topChange",
             event
