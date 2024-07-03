@@ -28,8 +28,8 @@
     "url": "https://github.com/danfordgidraph/react-native-render-pdf/issues"
   },
   "dependencies": {
-    "md5": "^2.3.0",
-    "deprecated-react-native-prop-types": "^2.3.0"
+    "deprecated-react-native-prop-types": "^2.3.0",
+    "md5": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
@@ -67,5 +67,6 @@
   },
   "publishConfig": {
     "provenance": true
-  }
+  },
+  "packageManager": "yarn@4.3.1"
 }
