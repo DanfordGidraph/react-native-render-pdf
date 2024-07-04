@@ -87,7 +87,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
     
     private void sendEvent(WritableMap event) {
-        EventDispatcher dispatcher = UIManagerHelper.getEventDispatcherForReactTag(getContext(), getId());
+        EventDispatcher dispatcher = UIManagerHelper.getEventDispatcherForReactTag((ThemedReactContext) getContext(), getId());
         TopChangeEvent topChangeEvent = new TopChangeEvent(UIManagerHelper.getSurfaceId(this), getId(), event);
         if (dispatcher != null) {
             dispatcher.dispatchEvent(topChangeEvent);
