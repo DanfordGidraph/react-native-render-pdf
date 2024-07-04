@@ -124,7 +124,7 @@ android {
         minSdkVersion safeExtGet('minSdkVersion', 21)
         targetSdkVersion safeExtGet('targetSdkVersion', 33)
         versionCode 1
-        versionName "1.0.8"
+        versionName "1.0.9"
 
         buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString())
     }
