@@ -1,5 +1,4 @@
 /**
- * Original Author: Wonday (@wonday.org) Copyright (c) 2017-present
  * Copyright (c) 2024-present, Staxtech (@gidraphdanford.dev)
  * All rights reserved.
  *
