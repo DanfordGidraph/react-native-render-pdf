@@ -53,7 +53,8 @@ import org.staxtech.android.pdf.events.TopChangeEvent;
 
 @SuppressLint("ViewConstructor")
 public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompleteListener,OnErrorListener,OnTapListener,OnDrawListener,OnPageScrollListener, LinkHandler {
-    ReactContext reactContext = null;
+    private static final String TAG = "PdfView";
+    private ReactContext reactContext = null;
     private ThemedReactContext themedReactContext = null;
     private int page = 1;               // start from 1
     private boolean horizontal = false;
@@ -76,6 +77,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     private float lastPageWidth = 0;
     private float lastPageHeight = 0;
 
+    private long loadCompleteTime = 0;
+
     // used to store the parameters for `super.onSizeChanged`
     private int oldW = 0;
     private int oldH = 0;
@@ -87,9 +90,11 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     }
     
     private void sendEvent(WritableMap event) {
+//        Log.d(TAG, "sendEvent: "+event.toString());
         EventDispatcher dispatcher = UIManagerHelper.getEventDispatcherForReactTag((ThemedReactContext) getContext(), getId());
         TopChangeEvent topChangeEvent = new TopChangeEvent(UIManagerHelper.getSurfaceId(this), getId(), event);
         if (dispatcher != null) {
+//            Log.i(TAG, "sendEvent: dispatching event to JS:: " + event.toString());
             dispatcher.dispatchEvent(topChangeEvent);
         }
     }
@@ -101,9 +106,11 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         this.page = page;
         showLog(format("%s %s / %s", path, page, numberOfPages));
 
-        WritableMap event = Arguments.createMap();
-        event.putString("message", "pageChanged|"+page+"|"+numberOfPages);
-        sendEvent(event);
+        if(System.currentTimeMillis() - loadCompleteTime > 1000) {
+            WritableMap event = Arguments.createMap();
+            event.putString("message", "pageChanged|"+page+"|"+numberOfPages);
+            sendEvent(event);
+        }
     }
 
     // In some cases Yoga (I think) will measure the view only along one axis first, resulting in
@@ -140,8 +147,8 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         Gson gson = new Gson();
         event.putString("message", "loadComplete|"+numberOfPages+"|"+width+"|"+height+"|"+gson.toJson(this.getTableOfContents()));
         sendEvent(event);
-
-        //Log.e("ReactNative", gson.toJson(this.getTableOfContents()));
+        loadCompleteTime = System.currentTimeMillis();
+//        Log.e(TAG+" loadComplete:: ", gson.toJson(this.getTableOfContents()));
 
     }
 
