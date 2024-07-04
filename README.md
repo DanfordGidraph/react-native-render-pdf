@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/react-native-render-pdf.svg?style=flat-square)](https://www.npmjs.com/package/react-native-render-pdf)
 
-A react native PDF view component (cross-platform support)
+A high performance & feature rich React Native PDF View component (cross-platform support across iOS and Android and Windows)
 
 ### Feature
 
@@ -61,6 +61,16 @@ react-native link react-native-render-pdf
 
 <details>
   <summary>Android details</summary>
+
+\*\*Add following to your android/build.gradle\*\*
+
+```diff
+ext {
+  ...
++   kotlinVersion = "1.9.24' // or latest
+  ...
+}
+```
 
 **If you use RN 0.59.0 and above**, please add following to your android/app/build.gradle\*\*
 
@@ -333,3 +343,10 @@ Example:
 ```
 this.pdf.setPage(42); // Display the answer to the Ultimate Question of Life, the Universe, and Everything
 ```
+
+### Derived Works and Contributions Acknowledgement
+
+- Based on the original work by [Wonday](@wonday) [react-native-pdf-view](https://github.com/wonday/react-native-pdf)
+- Implements the [react-native-blob-util](https://github.com/RonRadtke/react-native-blob-util) library for file system access
+- Implements the [android-pdfview Fork](https://github.com/Infomaniak/android-pdfview) library for Android by Infomaniak
+- Implements the [PDFiumAndroid Fork](https://github.com/Infomaniak/PdfiumAndroid) by Infomaniak
