@@ -22,6 +22,8 @@ import android.view.MotionEvent;
 import android.graphics.Canvas;
 
 
+import com.facebook.react.uimanager.UIManagerHelper;
+import com.facebook.react.uimanager.events.EventDispatcher;
 import com.infomaniak.lib.pdfview.PDFView;
 import com.infomaniak.lib.pdfview.listener.OnPageChangeListener;
 import com.infomaniak.lib.pdfview.listener.OnLoadCompleteListener;
@@ -37,7 +39,6 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import static java.lang.String.format;
 
@@ -48,9 +49,12 @@ import java.util.Objects;
 import com.google.gson.Gson;
 import com.shockwave.pdfium.util.SizeF;
 
+import org.staxtech.android.pdf.events.TopChangeEvent;
+
 @SuppressLint("ViewConstructor")
 public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompleteListener,OnErrorListener,OnTapListener,OnDrawListener,OnPageScrollListener, LinkHandler {
     ReactContext reactContext = null;
+    private ThemedReactContext themedReactContext = null;
     private int page = 1;               // start from 1
     private boolean horizontal = false;
     private float scale = 1;
@@ -79,6 +83,15 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     public PdfView(ThemedReactContext context, AttributeSet set, ReactContext mCallerContext){
         super(context,set);
         reactContext = mCallerContext;
+        themedReactContext = context;
+    }
+    
+    private void sendEvent(WritableMap event) {
+        EventDispatcher dispatcher = UIManagerHelper.getEventDispatcherForReactTag(themedReactContext, getId());
+        TopChangeEvent topChangeEvent = new TopChangeEvent(UIManagerHelper.getSurfaceId(this), getId(), event);
+        if (dispatcher != null) {
+            dispatcher.dispatchEvent(topChangeEvent);
+        }
     }
 
     @Override
@@ -90,11 +103,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "pageChanged|"+page+"|"+numberOfPages);
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            this.getId(),
-            "topChange",
-            event
-         );
+        sendEvent(event);
     }
 
     // In some cases Yoga (I think) will measure the view only along one axis first, resulting in
@@ -130,12 +139,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         //create a new json Object for the TableOfContents
         Gson gson = new Gson();
         event.putString("message", "loadComplete|"+numberOfPages+"|"+width+"|"+height+"|"+gson.toJson(this.getTableOfContents()));
-        ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            this.getId(),
-            "topChange",
-            event
-         );
+        sendEvent(event);
 
         //Log.e("ReactNative", gson.toJson(this.getTableOfContents()));
 
@@ -149,13 +153,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
         } else {
             event.putString("message", "error|"+t.getMessage());
         }
-
-        ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            this.getId(),
-            "topChange",
-            event
-         );
+        sendEvent(event);
     }
 
     @Override
@@ -176,13 +174,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
         WritableMap event = Arguments.createMap();
         event.putString("message", "pageSingleTap|"+page+"|"+e.getX()+"|"+e.getY());
-
-        ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            this.getId(),
-            "topChange",
-            event
-         );
+        sendEvent(event);
 
         // process as tap
          return true;
@@ -202,13 +194,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
 
             WritableMap event = Arguments.createMap();
             event.putString("message", "scaleChanged|"+(pageWidth/originalWidth));
-
-            ReactContext reactContext = (ReactContext)this.getContext();
-            reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                this.getId(),
-                "topChange",
-                event
-             );
+            sendEvent(event);
         }
 
         lastPageWidth = pageWidth;
@@ -372,13 +358,7 @@ public class PdfView extends PDFView implements OnPageChangeListener,OnLoadCompl
     private void handleUri(String uri) {
         WritableMap event = Arguments.createMap();
         event.putString("message", "linkPressed|"+uri);
-
-        ReactContext reactContext = (ReactContext)this.getContext();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-            this.getId(),
-            "topChange",
-            event
-        );
+        sendEvent(event);
     }
 
     /**
