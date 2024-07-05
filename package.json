@@ -1,6 +1,6 @@
 {
   "name": "react-native-render-pdf",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "summary": "A high performance React Native PDF Rendering component",
   "description": "A high performance & feature rich React Native PDF View component written in Obj-C++ for iOS, Kotlin for Android and C++ for Windows",
   "main": "index.js",
