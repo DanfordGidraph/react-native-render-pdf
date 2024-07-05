@@ -14,11 +14,11 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import DoubleTapView from 'react-native-render-pdf/DoubleTapView';
-import PdfManager from 'react-native-render-pdf/PdfManager';
-import PdfPageView from 'react-native-render-pdf/PdfPageView';
-import PdfViewFlatList from 'react-native-render-pdf/PdfViewFlatList';
-import PinchZoomView from 'react-native-render-pdf/PinchZoomView';
+import DoubleTapView from 'react-native-render-pdf/src/DoubleTapView';
+import PdfManager from 'react-native-render-pdf/src/PdfManager';
+import PdfPageView from 'react-native-render-pdf/src/PdfPageView';
+import PdfViewFlatList from 'react-native-render-pdf/src/PdfViewFlatList';
+import PinchZoomView from 'react-native-render-pdf/src/PinchZoomView';
 import PropTypes from 'prop-types';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 
