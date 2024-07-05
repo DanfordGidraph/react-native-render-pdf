@@ -14,16 +14,16 @@
 import React, { Component } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import DoubleTapView from 'react-native-render-pdf/src/DoubleTapView';
-import PdfManager from 'react-native-render-pdf/src/PdfManager';
-import PdfPageView from 'react-native-render-pdf/src/PdfPageView';
-import PdfViewFlatList from 'react-native-render-pdf/src/PdfViewFlatList';
-import PinchZoomView from 'react-native-render-pdf/src/PinchZoomView';
+import DoubleTapView from './DoubleTapView.js';
+import PdfManager from './PdfManager.js';
+import PdfPageView from './PdfPageView.js';
+import PdfViewFlatList from './PdfViewFlatList.js';
+import PinchZoomView from './PinchZoomView.js';
 import PropTypes from 'prop-types';
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 
 const MIN_SCALE = 1;
-const MAX_SCALE = 3;
+const MAX_SCALE = 5;
 
 const VIEWABILITYCONFIG = { minimumViewTime: 500, itemVisiblePercentThreshold: 10, waitForInteraction: false };
 
