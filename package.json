@@ -1,6 +1,6 @@
 {
   "name": "react-native-render-pdf",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "summary": "A modern React Native PDF view component",
   "description": "A modern React Native PDF view component that supports Android and iOS",
   "main": "index.js",
