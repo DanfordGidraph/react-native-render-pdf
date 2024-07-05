@@ -22,7 +22,7 @@ import PdfViewNativeComponent, {
 } from 'react-native-render-pdf/fabric/RNPDFPdfNativeComponent';
 import React, { Component } from 'react';
 
-import PdfView from 'react-native-render-pdf/PdfView';
+import PdfView from 'react-native-render-pdf/src/PdfView';
 import PropTypes from 'prop-types';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
