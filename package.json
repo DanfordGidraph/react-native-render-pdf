@@ -132,5 +132,11 @@
   "publishConfig": {
     "provenance": true
   },
-  "packageManager": "yarn@4.3.1"
+  "packageManager": "yarn@4.3.1",
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "parser": "typescript",
+      "style": "import-sort-style-module-compact"
+    }
+  }
 }
