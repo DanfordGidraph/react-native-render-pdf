@@ -9,20 +9,11 @@
 
 'use strict';
 
-import {
-    Image,
-    Platform,
-    StyleSheet,
-    Text,
-    View,
-    requireNativeComponent
-} from 'react-native';
-import PdfViewNativeComponent, {
-    Commands as PdfViewCommands,
-} from 'react-native-render-pdf/fabric/RNPDFPdfNativeComponent';
 import React, { Component } from 'react';
+import { Image, Platform, StyleSheet, Text, View, requireNativeComponent } from 'react-native';
+import PdfViewNativeComponent, { Commands as PdfViewCommands, } from './src/fabric/RNPDFPdfNativeComponent';
 
-import PdfView from 'react-native-render-pdf/src/PdfView';
+import PdfView from './src/PdfView.js';
 import PropTypes from 'prop-types';
 import ReactNativeBlobUtil from 'react-native-blob-util'
 import { ViewPropTypes } from 'deprecated-react-native-prop-types';
